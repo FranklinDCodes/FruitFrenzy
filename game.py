@@ -1,121 +1,104 @@
-# imports
 import pygame as pg
 from pygame import image, Surface, transform
 from random import choice, randint
 from os import path
+from settings import *
+from sprites import *
 
-# Init pygame
-pg.init()
+class Game:
 
-# CONSTANTS
-# game
-FRAME_RATE = 60
-WINDOW_RESOLUTION = (850, 500)
-
-# Create window
-GAME_WINDOW = pg.display.set_mode(WINDOW_RESOLUTION)
-pg.display.set_caption("Fruit Frenzy!")
-BACKGROUND = pg.Surface(WINDOW_RESOLUTION)
-GAME_WINDOW.blit(BACKGROUND, (0, 0))
-
-# layout
-LANE_WIDTH = 80
-FRUIT_SIZE = .5
-LEFT_MARGIN = 225
-LANES = 7
-
-# colors
-WHITE = (255, 255, 255)
-RED = (255, 0, 30)
-
-# directories
-IMG_DIR = path.join(path.dirname(__file__), "Imgs")
-
-# fruits
-FRUIT_SPAWN_RATE = 50
-def load_img(fl_name, size = (LANE_WIDTH*FRUIT_SIZE, LANE_WIDTH*FRUIT_SIZE)):
-    global IMG_DIR
-    fruit_img = image.load(path.join(IMG_DIR, fl_name))
-    fruit_surf = Surface.convert_alpha(fruit_img)
-    fruit = transform.scale(fruit_surf, size)
-    return fruit
-
-LEMON = load_img("orb5.png")
-COCONUT = load_img("orb6.png")
-BANANA = load_img("orb1.png")
-#ORANGE = None
-#PINEAPPLE = None
-
-# different fruit sprites and their speed
-fruit_types = [
-    #[PINEAPPLE, 4],
-    [COCONUT, 2],
-    [BANANA, 1],
-    #[ORANGE, 1],
-    [LEMON, 1]
-    ]
-
-# SPRITES
-class Fruit(pg.sprite.Sprite):
-    
     def __init__(self):
-        super().__init__()
-        fruit_sprites.add(self)
-        fruit = choice(fruit_types)
-        self.lane = randint(1, LANES)
-        self.image = fruit[0]
-        self.rect = self.image.get_rect(center=(self.lane*LANE_WIDTH + LANE_WIDTH/2 + LEFT_MARGIN, -10))
-        self.speed = fruit[1]
+
+        # init
+        pg.init()
+        pg.mixer.init()
+
+        # window setup
+        self.WINDOW = pg.display.set_mode((WIDTH, HEIGHT))
+        self.BACKGROUND = pg.Surface(WINDOW_RESOLUTION)
+        pg.display.set_caption("FRUIT FRENZY")
+
+        # load images
+        self.load_all_imgs()
+
+        # start running
+        self.running = True
+
+        # start screen
+        self.splash_screen()
+
+    def load_all_imgs(self):
+
+        def load(fl_name, size = (LANE_WIDTH*FRUIT_SIZE, LANE_WIDTH*FRUIT_SIZE)):
+            global IMG_DIR
+            fruit_img = image.load(path.join(IMG_DIR, fl_name))
+            fruit_surf = Surface.convert_alpha(fruit_img)
+            fruit = transform.scale(fruit_surf, size)
+            return fruit
+
+        self.LEMON = load("orb5.png")
+        self.COCONUT = load("orb6.png")
+        self.BANANA = load("orb1.png")
+        self.ORANGE = load("orb6.png")
+        self.PINEAPPLE = load("orb1.png")
+
+        # different [fruit sprite images, and their speed]
+        self.FRUIT_TYPES = list(zip([self.PINEAPPLE, self.COCONUT, self.BANANA, self.ORANGE, self.LEMON], [i[1] for i in FRUIT_SPEEDS]))
         
-    def update(self):
-        GAME_WINDOW.blit(BACKGROUND, (self.rect.x, self.rect.y), self.rect)
-        self.rect.y += self.speed
-        GAME_WINDOW.blit(self.image, (self.rect.x, self.rect.y))
 
-# LEVELS
-class Level(object):
+    def launch_game(self):
+        
+        # blit background
+        self.WINDOW.blit(self.BACKGROUND, (0, 0))
 
-    def __init__(self, name, spawn_rate, fruits):
-        self.name = name
-        self.spawn_rate = spawn_rate
-        self.fruits = fruits
+        # Draw Lines
+        for i in range(LANES + 1):
+            pg.draw.line(self.WINDOW, WHITE, (i*LANE_WIDTH + LEFT_MARGIN, 0), (i*LANE_WIDTH + LEFT_MARGIN, 350), 4)
 
-    def update(self):
+        # track which lanes are occupied
+        self.lanes_occupied = [False for i in range(LANES)]
+
+        # set clock
+        self.clock = pg.time.Clock()
+
+    def main_loop(self):
+        
+        self.playing = True
+        while self.playing:
+            self.clock.tick(FRAME_RATE)
+            self.update()
+            self.events()
+            self.draw()
+            pg.display.flip()
+
+    def splash_screen(self, score=None):
         pass
-
-"""# test
-for i in range(1000):
-    lane = choice(range(7, 14))
-    pg.draw.circle(BACKGROUND, RED, (lane*50 + 25, 10), 5)"""
-
-# Draw Line
-for i in range(LANES + 1):
-    pg.draw.line(GAME_WINDOW, WHITE, (i*LANE_WIDTH + LEFT_MARGIN, 0), (i*LANE_WIDTH + LEFT_MARGIN, 350), 4)
-
-# sprites
-fruit_sprites = pg.sprite.Group()
-
-# --------------------------------------------------
-# Start Main Game Loop
-game_running = True
-program_running = True
-clock = pg.time.Clock()
-
-while game_running:
-
-    # Check for events
-    for event in pg.event.get():
-
-        # Exit loop if quit
-        if event.type == pg.QUIT:
-            game_running = False
-            program_running = False
     
-    if not randint(0, FRUIT_SPAWN_RATE):
-        Fruit()
+    def update(self):
+        self.WINDOW.blit(self.BACKGROUND, (0, 0))
+        all_sprites.update()
+
+    def events(self):
+        for event in pg.event.get():
+
+            # check for quit
+            if event.type == pg.QUIT:
+                self.running = False
+                if self.playing:
+                    self.playing = False
         
-    fruit_sprites.update()
+        # spawn fruits
+        if not randint(0, FRUIT_SPAWN_RATE) and len([i for i in self.lanes_occupied if not i]) > 0:
+            fruit = Fruit(self.WINDOW, self.FRUIT_TYPES, [i[1] for i in zip(self.lanes_occupied, range(LANES)) if not i[0]])
+            self.lanes_occupied[fruit.lane] = True
 
-    pg.display.update()
+        # despawn fruits
+        for fruit in fruit_sprites:
+            if fruit.rect.top > HEIGHT:
+                self.lanes_occupied[fruit.lane] = False
+                fruit.kill()
 
-    clock.tick(FRAME_RATE)
+    def draw(self):
+        for i in range(LANES + 1):
+            pg.draw.line(self.WINDOW, WHITE, (i*LANE_WIDTH + LEFT_MARGIN, 0), (i*LANE_WIDTH + LEFT_MARGIN, 350), 4)
+
