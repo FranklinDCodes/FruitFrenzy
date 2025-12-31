@@ -150,8 +150,8 @@ class Game:
                 
         def upgrade_speed():
             if self.speed_level <= 4 and self.money >= SPEED_UPGRADE_PRICES[self.speed_level]:
-                self.money -= SPEED_UPGRADE_PRICES[self.speed_level]
-                self.speed_level += 1
+                    self.money -= SPEED_UPGRADE_PRICES[self.speed_level]
+                    self.speed_level += 1
 
         # buttons
         self.bask_button = Button(self.WINDOW, (20, HEIGHT - 215, 70, 20), GREEN, "Upgrade", self.BUTTON_LABEL_TEXT, BLACK, upgrade_size, "bask")
@@ -216,6 +216,9 @@ class Game:
             self.draw()
             self.loop_counter += 1
             pg.display.flip()
+
+        pg.quit()
+        exit(1)
 
     def splash_screen(self, score=None, win=False):
         
@@ -446,8 +449,6 @@ class Game:
                 self.running = False
                 if self.playing:
                     self.playing = False
-                pg.quit()
-                exit(1)
                 
             if event.type == pg.MOUSEBUTTONUP and not self.in_level:
                 mouse = pg.mouse.get_pos()

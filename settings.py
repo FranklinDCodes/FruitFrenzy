@@ -64,8 +64,8 @@ SCORE_FONT = path.join(FONT_DIR, "ARLRDBD.TTF")
 
 # upgrades
 PLAYER_SPEEDS = (6, 7, 8, 9, 10)
-SPEED_UPGRADE_PRICES = (40, 80, 170, 250, 300)
-BASKET_UPGRADES_PRICES = (40, 90, 200, 500, 600)
+SPEED_UPGRADE_PRICES = (40, 80, 170, 250, None)
+BASKET_UPGRADES_PRICES = (40, 90, 200, 500, None)
 
 # LEVEL SETUP
 def eq(b, c, x, a = None):
@@ -85,7 +85,7 @@ for level_num in range(LEVEL_COUNT):
              'fruit_value': eq(-1, 4, level_num, 1.5),
              'fruit_score': eq(2, 50, level_num, 2), 
              'score_add': eq(-1, 20, level_num), 
-             'money_add': eq(-2, 150, level_num), 
+             'money_add': eq(-2, 150, level_num),
              'level_value': eq(2, 20, level_num, 2.5), 
              'level_score': eq(0, 200, level_num, 3.5)}
     LEVELS.append(level)
