@@ -1,9 +1,0 @@
-To Do
- - Toy with level settings
- - Toy with hitbox sizes and upgrade prices
- - add score screen
- - add possible definative end
- - optional:
-    - seagulls?
-    - high score screen with initials?
-    
