@@ -4,7 +4,7 @@
 
 version="$1"
 
-pyinstaller --onefile --windowed \
+python3 -m PyInstaller --onefile --windowed \
   --add-data "assets:assets" \
   --name "FruitFrenzy${version}" \
   main.py
