@@ -11,3 +11,4 @@ python3 -m PyInstaller --onefile --windowed \
 
 rm -f "FruitFrenzy${version}.spec"
 rm -rf "build/FruitFrenzy${version}/"
+rm "dist/FruitFrenzy${version}"
