@@ -7,6 +7,7 @@ from csv import reader, writer
 from settings import *
 from classes import *
 
+
 class Game:
 
     def __init__(self):
@@ -185,8 +186,17 @@ class Game:
 
         pg.time.wait(3000)
 
-        with open("highscores.csv", "r") as fl:
-            highscores = list(reader(fl))
+        try:
+
+            with open(top_score_path, "r") as fl:
+                highscores = list(reader(fl))
+
+            if len(highscores) == 0:
+                highscores = [[0, "---"] for i in range(5)]
+
+        except FileNotFoundError:
+
+            highscores = [[0, "---"] for i in range(5)]
 
         highscores = [[int(i[0]), i[1]] for i in highscores]
         highscores.sort(reverse=True)
@@ -200,7 +210,7 @@ class Game:
 
             new_high_scores = self.high_score_screen(self.score, highscores)
 
-            with open("highscores.csv", "w") as fl:
+            with open(top_score_path, "w") as fl:
                 w = writer(fl, lineterminator="\n")
                 w.writerows(new_high_scores)
 
@@ -208,11 +218,11 @@ class Game:
 
     def main_loop(self):
         
-        self.playing = True
-        while self.playing:
+        while self.running:
             self.clock.tick(FRAME_RATE)
             self.update()
             self.events()
+
             self.draw()
             self.loop_counter += 1
             pg.display.flip()
@@ -240,8 +250,7 @@ class Game:
                 for event in pg.event.get():
                     if event.type == pg.QUIT:
                         self.running = False
-                        self.splash = False
-                        pg.quit()
+                        splash = False
                         break
                 
                     if event.type == pg.KEYUP and event.key == pg.K_RETURN:
@@ -263,8 +272,7 @@ class Game:
                 for event in pg.event.get():
                     if event.type == pg.QUIT:
                         self.running = False
-                        self.splash = False
-                        pg.quit()
+                        splash = False
                         break
                 
                     if event.type == pg.KEYUP and event.key == pg.K_RETURN:
@@ -400,7 +408,9 @@ class Game:
             self.clock.tick(FRAME_RATE)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    pg.quit()
+                    self.running = False
+                    screen = False
+                    break
                 
                 if event.type == pg.MOUSEBUTTONUP:
                     mouse = pg.mouse.get_pos()
@@ -447,8 +457,6 @@ class Game:
             # check for quit
             if event.type == pg.QUIT:
                 self.running = False
-                if self.playing:
-                    self.playing = False
                 
             if event.type == pg.MOUSEBUTTONUP and not self.in_level:
                 mouse = pg.mouse.get_pos()
@@ -533,7 +541,6 @@ class Game:
                     fruit.kill()
                     pg.mixer.Sound.play(self.miss_sound)
                     if self.lives == 1:
-                        self.playing = False
                         self.reset_game()
                     else:
                         self.lives -= 1

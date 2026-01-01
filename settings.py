@@ -1,4 +1,15 @@
 from os import path
+import os
+import sys
+from platformdirs import user_data_dir
+
+# written by ChatGPT
+def resource_path(path):
+    try:
+        base = sys._MEIPASS
+    except:
+        base = os.path.abspath(".")
+    return os.path.join(base, path)
 
 # window
 FRAME_RATE = 60
@@ -35,8 +46,16 @@ PLAYER_HEIGHT = 5000/25
 PLAYER_Y = 390 #405
 
 # directories
-IMG_DIR = path.join(path.dirname(__file__), "Imgs")
-SND_DIR = path.join(path.dirname(__file__), "Sounds")
+IMG_DIR = resource_path(path.join("assets", "Imgs"))
+SND_DIR = resource_path(path.join("assets", "Sounds"))
+FONT_DIR = resource_path(path.join("assets", "Fonts"))
+
+# code from ChatGPT
+APP_NAME = "FruitFrenzy"
+APP_AUTHOR = "Franklin Doane"
+save_dir = user_data_dir(APP_NAME, APP_AUTHOR)
+os.makedirs(save_dir, exist_ok=True)
+top_score_path = os.path.join(save_dir, "highscores.csv")
 
 # fruits
 FRUIT_SPEEDS = [
@@ -48,16 +67,15 @@ FRUIT_SPEEDS = [
 
 # hitbox size
 HITBOX_SIZE_1, HITBOX_SIZE_1_Y = (64, 15), 360
-HITBOX_SIZE_2, HITBOX_SIZE_2_Y = (82, 20), 362
-HITBOX_SIZE_3, HITBOX_SIZE_3_Y = (100, 25), 357
-HITBOX_SIZE_4, HITBOX_SIZE_4_Y = (120, 30), 352
-HITBOX_SIZE_5, HITBOX_SIZE_5_Y = (140, 35), 347
+HITBOX_SIZE_2, HITBOX_SIZE_2_Y = (82, 20), 355 # 362
+HITBOX_SIZE_3, HITBOX_SIZE_3_Y = (100, 25), 350 # 357
+HITBOX_SIZE_4, HITBOX_SIZE_4_Y = (120, 30), 345 # 352
+HITBOX_SIZE_5, HITBOX_SIZE_5_Y = (140, 35), 340 # 347
 HITBOX_SIZES = (HITBOX_SIZE_1, HITBOX_SIZE_2, HITBOX_SIZE_3, HITBOX_SIZE_4, HITBOX_SIZE_5)
 HITBOX_YS = {HITBOX_SIZE_1: HITBOX_SIZE_1_Y, HITBOX_SIZE_2: HITBOX_SIZE_2_Y, HITBOX_SIZE_3: HITBOX_SIZE_3_Y, HITBOX_SIZE_4: HITBOX_SIZE_4_Y, HITBOX_SIZE_5: HITBOX_SIZE_5_Y}
 HITBOX_X_ADD = 1
 
 # FONTS
-FONT_DIR = "Fonts"
 MONEY_FONT = path.join(FONT_DIR, "HARLOWSI.TTF")
 LABEL_FONT = path.join(FONT_DIR, "ROCKB.TTF")
 SCORE_FONT = path.join(FONT_DIR, "ARLRDBD.TTF")
